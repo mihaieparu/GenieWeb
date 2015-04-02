@@ -1,6 +1,6 @@
 <?php
 	date_default_timezone_set('Europe/Bucharest');
-	$con = mysqli_connect("localhost", "root", "", "haufe");
+	$con = mysqli_connect("mysql.hostinger.ro", "u517020093_haufe", "haufe12345", "u517020093_haufe");
 	if (mysqli_connect_errno($con)) {
 		echo "Eroare la conectare : ".mysqli_connect_error();
 	}
