@@ -1,0 +1,28 @@
+@import url(http://fonts.googleapis.com/css?family=PT+Serif:400,400italic|Titillium+Web:200,300,400,600,700&subset=latin,latin-ext);
+html, body {
+	height: 100%;
+}
+#login .panel-body {
+	padding:15px;
+	margin:30px;
+}
+#login {
+	max-width:350px;
+}
+.container {
+	position:relative;
+	width:auto;
+	margin:auto;
+	max-width:1024px;
+}
+.container .panel-body {
+	padding:30px;
+	text-align:justify;
+}
+.modal-body td {
+	padding:10px;
+	padding-right:0;
+}
+.modal-sm {
+	width:400px;
+}
