@@ -42,6 +42,7 @@
                     <li><a href="view.php?what=timeline">Timeline</a></li>
                     <li><a href="view.php?what=menu">Menu</a></li>
                     <li><a href="view.php?what=pages">Pages</a></li>
+                    <li><a href="view.php?what=routes">Routes</a></li>
                 </ul>
             </li>
             <li class="dropdown">
@@ -51,13 +52,21 @@
                     <li><a href="view.php?what=definitions">Definitions</a></li>
                 </ul>
             </li>
-            <li><a href="view.php?what=routes"><span class="fa fa-fw fa-random"></span> Routes</a></li>
+            <li class="dropdown">
+                <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false"><span class="fa fa-fw fa-newspaper-o"></span> Newsletter <span class="caret"></span></a>
+                <ul class="dropdown-menu" role="menu">
+                    <li><a href="newsletter.php?to=JSON" target="_blank">Export to JSON</a></li>
+                    <li><a href="newsletter.php?to=CSV" target="_blank">Export to CSV</a></li>
+                    <li><a href="newsletter.php?to=XML" target="_blank">Export to XML</a></li>
+                    <li><a href="newsletter.php?to=PLAIN" target="_blank">Export to plain text</a></li>
+                </ul>
+            </li>
 			<li><a href="view.php?what=users"><span class="fa fa-fw fa-users"></span> Users</a></li>
             <li class="dropdown">
                 <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false"><span class="fa fa-fw fa-pie-chart"></span> Statistics <span class="caret"></span></a>
                 <ul class="dropdown-menu" role="menu">
                     <li><a href="view.php?what=statistics&type=summary">Summary</a></li>
-                    <li><a href="edit.php?what=statistics&type=detailed">Detailed</a></li>
+                    <li><a href="view.php?what=statistics&type=detailed">Detailed</a></li>
                 </ul>
             </li>
             <li><a href="javascript:logout();"><span class="fa fa-fw fa-sign-out"></span> Log out</a></li>
@@ -105,7 +114,7 @@
 							echo 0;
 						}
 					?>
-                    </b> languages in the database, which describe <b>
+                    </b> languages in the database, which are described by <b>
                     <?php
 						if ($res) { 
 							$joins = ""; $prec = "";

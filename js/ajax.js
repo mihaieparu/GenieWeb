@@ -233,7 +233,7 @@ function JSONRender(string, jumpTo) {
 					break;
 			}
 			jhtml += '<div class="blackfix">&nbsp;</div>';
-			jhtml += '<div id="jumbo-text" class="jumbotron-container" data-center-x="true" data-center-y="true"><h1>' + obj.PageContent.jumbotron.h1 + '</h1>' + (obj.PageContent.jumbotron.divider == "true" ? '<div class="h-divider"></div>' : '') + (obj.PageContent.jumbotron.h2 ? '<h2>' + obj.PageContent.jumbotron.h2 + '</h2>' : '');
+			jhtml += '<div id="jumbo-text" class="jumbotron-container" data-center-x="true" data-center-y="true"><h1>' + (obj.PageContent.jumbotron.h1.indexOf("@") == -1 ? obj.PageContent.jumbotron.h1 : '<span data-translr-value="' + obj.PageContent.jumbotron.h1 + '"></span>') + '</h1>' + (obj.PageContent.jumbotron.divider == "true" ? '<div class="h-divider"></div>' : '') + (obj.PageContent.jumbotron.h2 ? '<h2>' + (obj.PageContent.jumbotron.h2.indexOf("@") == -1 ? obj.PageContent.jumbotron.h2 : '<span data-translr-value="' + obj.PageContent.jumbotron.h2 + '"></span>') + '</h2>' : '');
 			if (obj.PageContent.jumbotron.buttons) {
 				jhtml += '<br />';
 				for (var i = 0; i < obj.PageContent.jumbotron.buttons.length; i++) {

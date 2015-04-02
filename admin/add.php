@@ -30,7 +30,7 @@
 		],
 		toolbar1: "insertfile undo redo | styleselect | bold italic | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | link image",
 		toolbar2: "fontselect fontsizeselect | print preview media | forecolor backcolor emoticons",
-		image_advtab: true,
+		image_advtab: true
 	 });
 </script>
 </head>
@@ -62,6 +62,7 @@
                     <li><a href="view.php?what=timeline">Timeline</a></li>
                     <li><a href="view.php?what=menu">Menu</a></li>
                     <li><a href="view.php?what=pages">Pages</a></li>
+                    <li><a href="view.php?what=routes">Routes</a></li>
                 </ul>
             </li>
             <li class="dropdown">
@@ -71,13 +72,21 @@
                     <li><a href="view.php?what=definitions">Definitions</a></li>
                 </ul>
             </li>
-            <li><a href="view.php?what=routes"><span class="fa fa-fw fa-random"></span> Routes</a></li>
+            <li class="dropdown">
+                <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false"><span class="fa fa-fw fa-newspaper-o"></span> Newsletter <span class="caret"></span></a>
+                <ul class="dropdown-menu" role="menu">
+                    <li><a href="newsletter.php?to=JSON" target="_blank">Export to JSON</a></li>
+                    <li><a href="newsletter.php?to=CSV" target="_blank">Export to CSV</a></li>
+                    <li><a href="newsletter.php?to=XML" target="_blank">Export to XML</a></li>
+                    <li><a href="newsletter.php?to=PLAIN" target="_blank">Export to plain text</a></li>
+                </ul>
+            </li>
 			<li><a href="view.php?what=users"><span class="fa fa-fw fa-users"></span> Users</a></li>
             <li class="dropdown">
                 <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false"><span class="fa fa-fw fa-pie-chart"></span> Statistics <span class="caret"></span></a>
                 <ul class="dropdown-menu" role="menu">
                     <li><a href="view.php?what=statistics&type=summary">Summary</a></li>
-                    <li><a href="edit.php?what=statistics&type=detailed">Detailed</a></li>
+                    <li><a href="view.php?what=statistics&type=detailed">Detailed</a></li>
                 </ul>
             </li>
             <li><a href="javascript:logout();"><span class="fa fa-fw fa-sign-out"></span> Log out</a></li>
@@ -116,7 +125,7 @@
 							$querydata .= "(`DateAdded`, `DateExpire`, `Ref`, `Title`, `City`, `Description`, `Applications`, `ApplicationEmail`) VALUES ('".time()."', '".mktime(23,59,0,$dexp[1],$dexp[2],$dexp[0])."', '".$_POST["Ref"]."', '".$_POST["Title"]."', '".$_POST["City"]."', '".base64_encode($_POST["Description"])."', '".(isset($_POST["Applications"]) ? '1' : '0')."', '".$_POST["ApplicationEmail"]."')";
 							break;
 						case "menu":
-							$querydata .= "(`URL`, `Name`, `Title`, `Target`, `Order`) VALUES ('".$_POST["URL"]."', '".$_POST["Name"]."', '".$_POST["Target"]."', '".$_POST["Order"]."')";
+							$querydata .= "(`URL`, `Name`, `Title`, `Target`, `Order`) VALUES ('".$_POST["URL"]."', '".$_POST["Name"]."', '".$_POST["Title"]."', '".$_POST["Target"]."', '".$_POST["Order"]."')";
 							break;
 						case "timeline":
 							$dexp = explode("-", $_POST["Date"]);
@@ -145,7 +154,16 @@
 					echo '<script>location.href="view.php?what='.$_GET["what"].'";</script>';
 				}
 				else {
-					
+					$_POST["Key"] = str_replace("'", "", strip_tags(urldecode($_POST["Key"])));
+					$res = retResult("languages", "");
+					if ($res) {
+						while ($row = mysqli_fetch_array($res)) {
+							if (isset($_POST["value-".$row["LangCode"]])) {
+								mysqli_query($con, "INSERT INTO `lang_".$row["LangCode"]."` (`Key`, `Value`) VALUES ('".$_POST["Key"]."', '".base64_encode(urldecode($_POST["value-".$row["LangCode"]]))."')");
+							}
+						}
+					}
+					echo '<script>location.href="view.php?what='.$_GET["what"].'";</script>';
 				}
 			}
 		}
@@ -154,7 +172,7 @@
 				switch ($_GET["what"]) {
 					case "jobs":
 						echo '<script>function checkToggle() { if (!$("#online-apps").prop("checked")) { $("#app-email").attr("disabled", "disabled"); } else { $("#app-email").removeAttr("disabled"); } }</script><div class="page-header" style="margin-top:0"><h1 style="margin-top:10px">Add a new job</h1></div>';
-						echo '<form action="add.php?what=jobs" method="POST"><input type="hidden" name="is_form" value="true" /><div class="row"><div class="col-lg-8 col-md-8 col-sm-12 col-xs-12 col-lg-offset-2 col-md-offset-2" style="margin-bottom:25px"><div class="input-group"><span class="input-group-addon">Title</span><input type="text" class="form-control" name="Title" required data-translr-await-id="1" placeholder="Title" /><span class="input-group-btn"><button class="btn btn-primary" onclick="javascript:triggerTranslrModal(1);" type="button" style="height:43px" title="Select Translr key"><span class="fa fa-fw fa-globe"></span></button></span></div></br><div class="input-group"><span class="input-group-addon">Expire date</span><input type="date" required name="DateExpire" class="form-control" placeholder="Expire date" /></div></br><div class="input-group"><span class="input-group-addon">Ref. #</span><input type="text" name="Ref" class="form-control" placeholder="Reference #" /></div></br><div class="input-group"><span class="input-group-addon">City</span><input type="text" name="City" class="form-control" placeholder="City" /></div></br><div class="input-group"><span class="input-group-addon"><input type="checkbox" name="Applications" id="online-apps" checked="checked" onchange="javascript:checkToggle();" /></span><input type="email" name="ApplicationEmail" class="form-control" id="app-email" placeholder="Applications email" /></div><br /><textarea class="tinymce-ta" name="Description" required></textarea><br /><center>You can use Translr keys in your content! Use the <kbd>@translr-<i>key</i></kbd> instead of the regular <kbd>@<i>key</i></kbd>.</center><br /><center><button type="submit" class="btn btn-default" style="margin-bottom:25px"><span class="fa fa-fw fa-plus"></span> Add job!</button></center></div></form>';
+						echo '<form action="add.php?what=jobs" novalidate method="POST"><input type="hidden" name="is_form" value="true" /><div class="row"><div class="col-lg-8 col-md-8 col-sm-12 col-xs-12 col-lg-offset-2 col-md-offset-2" style="margin-bottom:25px"><div class="input-group"><span class="input-group-addon">Title</span><input type="text" class="form-control" name="Title" required data-translr-await-id="1" placeholder="Title" /><span class="input-group-btn"><button class="btn btn-primary" onclick="javascript:triggerTranslrModal(1);" type="button" style="height:43px" title="Select Translr key"><span class="fa fa-fw fa-globe"></span></button></span></div></br><div class="input-group"><span class="input-group-addon">Expire date</span><input type="date" required name="DateExpire" class="form-control" placeholder="Expire date" /></div></br><div class="input-group"><span class="input-group-addon">Ref. #</span><input type="text" name="Ref" class="form-control" placeholder="Reference #" /></div></br><div class="input-group"><span class="input-group-addon">City</span><input type="text" name="City" class="form-control" placeholder="City" /></div></br><div class="input-group"><span class="input-group-addon"><input type="checkbox" name="Applications" id="online-apps" checked="checked" onchange="javascript:checkToggle();" /></span><input type="email" name="ApplicationEmail" class="form-control" id="app-email" placeholder="Applications email" /></div><br /><textarea class="tinymce-ta" name="Description" required></textarea><br /><center>You can use Translr keys in your content! Use the <kbd>@translr-<i>key</i></kbd> instead of the regular <kbd>@<i>key</i></kbd>.</center><br /><center><button type="submit" class="btn btn-default" style="margin-bottom:25px"><span class="fa fa-fw fa-plus"></span> Add job!</button></center></div></form>';
 						break;
 					case "menu":
 						echo '<div class="page-header" style="margin-top:0"><h1 style="margin-top:10px">Add a new menu element</h1></div>';
@@ -172,22 +190,22 @@
 						break;
 					case "languages":
 						echo '<div class="page-header" style="margin-top:0"><h1 style="margin-top:10px">Add a new language</h1></div>';
-						echo '<form action="add.php?what=language" method="POST"><input type="hidden" name="is_form" value="true" /><div class="row"><div style="margin-bottom:25px" class="col-lg-6 col-md-6 col-sm-12 col-xs-12 col-lg-offset-3 col-md-offset-3"><div class="input-group"><span class="input-group-addon">Language code</span><input type="text" class="form-control" name="LangCode" required placeholder="ISO 639-1 language code" /></div></br><div class="input-group"><span class="input-group-addon">Language name</span><input type="text" required name="LangName" class="form-control" placeholder="Language full name" /></div></br><div class="input-group"><span class="input-group-addon">Language show-as</span><input type="text" name="LangShow" class="form-control" placeholder="Language show-as" required /></div><br /><center><input type="checkbox" name="Default" id="def" /> <label for="def">Default language</label></div></div><center><button type="submit" class="btn btn-default" style="margin-bottom:25px"><span class="fa fa-fw fa-plus"></span> Add language!</button></center></div></form>';
+						echo '<form action="add.php?what=languages" method="POST"><input type="hidden" name="is_form" value="true" /><div class="row"><div style="margin-bottom:25px" class="col-lg-6 col-md-6 col-sm-12 col-xs-12 col-lg-offset-3 col-md-offset-3"><div class="input-group"><span class="input-group-addon">Language code</span><input type="text" class="form-control" name="LangCode" required placeholder="ISO 639-1 language code" /></div></br><div class="input-group"><span class="input-group-addon">Language name</span><input type="text" required name="LangName" class="form-control" placeholder="Language full name" /></div></br><div class="input-group"><span class="input-group-addon">Language show-as</span><input type="text" name="LangShow" class="form-control" placeholder="Language show-as" required /></div><br /><center><input type="checkbox" name="Default" id="def" /> <label for="def">Default language</label></div></div><center><button type="submit" class="btn btn-default" style="margin-bottom:25px"><span class="fa fa-fw fa-plus"></span> Add language!</button></center></div></form>';
 						break;
 					case "definitions":
 						echo '<div class="page-header" style="margin-top:0"><h1 style="margin-top:10px">Add a new definition</h1></div>';
-						echo '<form action="add.php?what=definitions" method="POST"><input type="hidden" name="is_form" value="true" /><div class="row"><div style="margin-bottom:25px" class="col-lg-6 col-md-6 col-sm-12 col-xs-12 col-lg-offset-3 col-md-offset-3"><div class="input-group"><span class="input-group-addon">Key</span><input type="text" class="form-control" name="Key" required placeholder="Key (e.g. @key/example)" /></div><br />';
+						echo '<form action="add.php?what=definitions" method="POST"><input type="hidden" name="is_form" value="true" /><div class="row"><div style="margin-bottom:25px" class="col-lg-6 col-md-6 col-sm-12 col-xs-12 col-lg-offset-3 col-md-offset-3"><div class="input-group"><span class="input-group-addon">Key</span><input type="text" class="form-control" name="Key" required placeholder="Key (e.g. @key/example)" /></div>';
 						$res = retResult("languages", "");
 						if ($res) {
 							while ($row = mysqli_fetch_array($res)) {
-								echo '<div class="input-group"><span class="input-group-addon"><img src="http://l10n.xwiki.org/xwiki/bin/download/L10N/Flags/'.$row["LangCode"].'.png" /></span><input type="text" name="value-'.$row["LangCode"].'" class="form-control" placeholder="String for '.$row["LangName"].'" /></div><br/>';
+								echo '<br/><div class="input-group"><span class="input-group-addon"><img src="http://l10n.xwiki.org/xwiki/bin/download/L10N/Flags/'.$row["LangCode"].'.png" /></span><input type="text" name="value-'.$row["LangCode"].'" class="form-control" placeholder="String for '.$row["LangName"].'" /></div>';
 							}
 						}
 						echo '</div></div><center><button type="submit" class="btn btn-default" style="margin-bottom:25px"><span class="fa fa-fw fa-plus"></span> Add definition!</button></center></form>';
 						break;
 					case "routes":
 						echo '<div class="page-header" style="margin-top:0"><h1 style="margin-top:10px">Add a new route</h1></div>';
-						echo '<form action="add.php?what=routes" method="POST"><input type="hidden" name="is_form" value="true" /><div class="row"><div style="margin-bottom:25px" class="col-lg-6 col-md-6 col-sm-12 col-xs-12 col-lg-offset-3 col-md-offset-3"><div class="input-group"><span class="input-group-addon">Route</span><input type="text" class="form-control" name="Route" required placeholder="Route" /></div></br><div class="input-group"><span class="input-group-addon">Attributes</span><input type="text" required name="Attributes" class="form-control" placeholder="Attributes received (e.g. %attr1%/%attr2%)" /></div></br><div class="input-group"><span class="input-group-addon">Route to</span><input type="text" name="RouteTo" class="form-control" required placeholder="Route to" /></div></br><div class="input-group"><span class="input-group-addon">Attributes sent</span><input type="text" name="RouteToAttributes" class="form-control" placeholder="Attributes sent (e.g. attr1=%attr1%/attr2=%attr2%)" /></div></div></div><center><button type="submit" class="btn btn-default" style="margin-bottom:25px"><span class="fa fa-fw fa-plus"></span> Add route!</button></center></div></form>';
+						echo '<form action="add.php?what=routes" method="POST"><input type="hidden" name="is_form" value="true" /><div class="row"><div style="margin-bottom:25px" class="col-lg-6 col-md-6 col-sm-12 col-xs-12 col-lg-offset-3 col-md-offset-3"><div class="input-group"><span class="input-group-addon">Route</span><input type="text" class="form-control" name="Route" required placeholder="Route" /></div></br><div class="input-group"><span class="input-group-addon">Attributes</span><input type="text" name="Attributes" class="form-control" placeholder="Attributes received (e.g. %attr1%/%attr2%)" /></div></br><div class="input-group"><span class="input-group-addon">Route to</span><input type="text" name="RouteTo" class="form-control" required placeholder="Route to" /></div></br><div class="input-group"><span class="input-group-addon">Attributes sent</span><input type="text" name="RouteToAttributes" class="form-control" placeholder="Attributes sent (e.g. attr1=%attr1%/attr2=%attr2%)" /></div></div></div><center><button type="submit" class="btn btn-default" style="margin-bottom:25px"><span class="fa fa-fw fa-plus"></span> Add route!</button></center></div></form>';
 						break;
 					case "users":
 						echo '<div class="page-header" style="margin-top:0"><h1 style="margin-top:10px">Add a new user</h1></div>';

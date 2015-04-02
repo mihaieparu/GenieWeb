@@ -16,7 +16,7 @@
 <script src="https://code.jquery.com/jquery-1.11.2.min.js"></script>
 <script src="https://code.jquery.com/ui/1.11.4/jquery-ui.min.js"></script>
 <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/js/bootstrap.min.js"></script>
-<script><?php echo 'var ign_pathname = "'.(strlen(dirname($_SERVER['REQUEST_URI'])) == 1 && dirname($_SERVER['REQUEST_URI']) != "/" ? $_SERVER['REQUEST_URI'] : dirname($_SERVER['REQUEST_URI']).'/').'";'; ?></script>
+<script><?php echo 'var ign_pathname = "'.dirname($_SERVER['REQUEST_URI']).'";'; ?></script>
 <script src="js/stats.js"></script>
 <script src="js/script.js"></script>
 <script src="js/mobile.js"></script>

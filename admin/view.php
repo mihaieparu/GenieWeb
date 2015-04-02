@@ -12,6 +12,7 @@
 <script src="https://code.jquery.com/jquery-1.11.2.min.js"></script>
 <script src="https://code.jquery.com/ui/1.11.4/jquery-ui.min.js"></script>
 <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/js/bootstrap.min.js"></script>
+<script type="text/javascript" src="https://www.google.com/jsapi"></script>
 <script src="js/script.js"></script>
 </head>
 <body>
@@ -42,6 +43,7 @@
                     <li><a href="view.php?what=timeline">Timeline</a></li>
                     <li><a href="view.php?what=menu">Menu</a></li>
                     <li><a href="view.php?what=pages">Pages</a></li>
+                    <li><a href="view.php?what=routes">Routes</a></li>
                 </ul>
             </li>
             <li class="dropdown">
@@ -51,13 +53,21 @@
                     <li><a href="view.php?what=definitions">Definitions</a></li>
                 </ul>
             </li>
-            <li><a href="view.php?what=routes"><span class="fa fa-fw fa-random"></span> Routes</a></li>
+            <li class="dropdown">
+                <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false"><span class="fa fa-fw fa-newspaper-o"></span> Newsletter <span class="caret"></span></a>
+                <ul class="dropdown-menu" role="menu">
+                    <li><a href="newsletter.php?to=JSON" target="_blank">Export to JSON</a></li>
+                    <li><a href="newsletter.php?to=CSV" target="_blank">Export to CSV</a></li>
+                    <li><a href="newsletter.php?to=XML" target="_blank">Export to XML</a></li>
+                    <li><a href="newsletter.php?to=PLAIN" target="_blank">Export to plain text</a></li>
+                </ul>
+            </li>
 			<li><a href="view.php?what=users"><span class="fa fa-fw fa-users"></span> Users</a></li>
             <li class="dropdown">
                 <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false"><span class="fa fa-fw fa-pie-chart"></span> Statistics <span class="caret"></span></a>
                 <ul class="dropdown-menu" role="menu">
                     <li><a href="view.php?what=statistics&type=summary">Summary</a></li>
-                    <li><a href="edit.php?what=statistics&type=detailed">Detailed</a></li>
+                    <li><a href="view.php?what=statistics&type=detailed">Detailed</a></li>
                 </ul>
             </li>
             <li><a href="javascript:logout();"><span class="fa fa-fw fa-sign-out"></span> Log out</a></li>
@@ -188,7 +198,7 @@
 								foreach ($langs as $lng) {
 									echo '<td>'.base64_decode($row["Value_".$lng]).'</td>';
 								}
-								echo '<td><a href="delete.php?what=definitions&id='.urlencode($row["Key"]).'" class="btn btn-sm btn-danger">Delete</a></td></tr>';
+								echo '<td><a href="edit.php?what=definitions&id='.urlencode($row["Key"]).'" class="btn btn-sm btn-primary">Edit</a> <a href="delete.php?what=definitions&id='.urlencode($row["Key"]).'" class="btn btn-sm btn-danger">Delete</a></td></tr>';
 							}
 							echo '</tbody></table></div>';
 						}
@@ -231,14 +241,253 @@
 					}
 					break;
 				case "statistics":
+					function returnMonth($mth) {
+						switch ($mth) {
+							case 1: return "january"; break;
+							case 2: return "february"; break;
+							case 3: return "march"; break;
+							case 4: return "april"; break;
+							case 5: return "may"; break;
+							case 6: return "june"; break;
+							case 7: return "july"; break;
+							case 8: return "august"; break;
+							case 9: return "september"; break;
+							case 10: return "october"; break;
+							case 11: return "november"; break;
+							case 12: return "december"; break;
+						}
+					}
 					$type = "summary";
 					if (isset($_GET["type"]) && $_GET["type"] != "") { $type = $_GET["type"]; };
 					switch ($type) {
 						case "summary":
-							
+							echo '<div class=".col-lg-6 .col-md-6 .col-sm-12 .col-xs-12" id="uniquevis-chart"></div>';
+							echo '<div class=".col-lg-6 .col-md-6 .col-sm-12 .col-xs-12" id="sessions-chart"></div>';
+							echo '<div class=".col-lg-6 .col-md-6 .col-sm-12 .col-xs-12" id="pagespent-chart"></div>';
+							echo '<div class=".col-lg-6 .col-md-6 .col-sm-12 .col-xs-12" id="sessspent-chart"></div>';
+							echo '<script>google.load("visualization", "1", {packages:["corechart"]}); google.setOnLoadCallback(drawChart);';
+							echo 'function drawChart() {
+								  var data = google.visualization.arrayToDataTable([
+									["Month", "Visitors"],';
+							for ($i = 1; $i <= 12; $i++) {
+								$res = retResult("visitors", "WHERE FirstVisit>".mktime(0, 0, 0, $i, 1, date("Y"))." AND FirstVisit<".mktime(0, 0, 0, ($i < 12 ? $i + 1 : 1), 1, ($i == 12 ? intval(date("Y")) + 1 : date("Y"))));
+								$uv = 0;
+								if ($res) {
+									$uv = mysqli_num_rows($res);
+								}
+								echo '["'.returnMonth($i).'", '.$uv.'],';
+							}
+							echo ']);
+								  var view = new google.visualization.DataView(data);
+								  var options = {
+									title: "Unique visitors/month",
+									width: "auto",
+									height: 400,
+								  };
+								  var chart = new google.visualization.ColumnChart(document.getElementById("uniquevis-chart"));
+								  chart.draw(view, options);';
+							echo 'var data = google.visualization.arrayToDataTable([
+									["Month", "Sessions"],';
+							for ($i = 1; $i <= 12; $i++) {
+								$res = retResult("sessions", "WHERE Start>".mktime(0, 0, 0, $i, 1, date("Y"))." AND Start<".mktime(0, 0, 0, ($i < 12 ? $i + 1 : 1), 1, ($i == 12 ? intval(date("Y")) + 1 : date("Y"))));
+								$uv = 0;
+								if ($res) {
+									$uv = mysqli_num_rows($res);
+								}
+								echo '["'.returnMonth($i).'", '.$uv.'],';
+							}
+							echo ']);
+								  var view = new google.visualization.DataView(data);
+								  var options = {
+									title: "Sessions/month",
+									width: "auto",
+									height: 400,
+								  };
+								  var chart = new google.visualization.ColumnChart(document.getElementById("sessions-chart"));
+								  chart.draw(view, options);';
+							echo 'var data = google.visualization.arrayToDataTable([
+									["Month", "Minutes"],';
+							for ($i = 1; $i <= 12; $i++) {
+								$res = mysqli_query($con, "SELECT AVG(End-Start) AS Minutes FROM visits WHERE Start>".mktime(0, 0, 0, $i, 1, date("Y"))." AND Start<".mktime(0, 0, 0, ($i < 12 ? $i + 1 : 1), 1, ($i == 12 ? intval(date("Y")) + 1 : date("Y"))).' AND End > 0');
+								$uv = 0;
+								if ($res) {
+									$row = mysqli_fetch_array($res);
+									$uv = ($row["Minutes"] ? $row["Minutes"] / 60 / 60 : 0);
+								}
+								echo '["'.returnMonth($i).'", '.$uv.'],';
+							}
+							echo ']);
+								  var view = new google.visualization.DataView(data);
+								  var options = {
+									title: "Average time spent/visit",
+									width: "auto",
+									height: 400,
+								  };
+								  var chart = new google.visualization.ColumnChart(document.getElementById("pagespent-chart"));
+								  chart.draw(view, options);';
+							echo 'var data = google.visualization.arrayToDataTable([
+									["Month", "Minutes"],';
+							for ($i = 1; $i <= 12; $i++) {
+								$res = mysqli_query($con, "SELECT AVG(End-Start) AS Minutes FROM sessions WHERE Start>".mktime(0, 0, 0, $i, 1, date("Y"))." AND Start<".mktime(0, 0, 0, ($i < 12 ? $i + 1 : 1), 1, ($i == 12 ? intval(date("Y")) + 1 : date("Y"))).' AND End > 0');
+								$uv = 0;
+								if ($res) {
+									$row = mysqli_fetch_array($res);
+									$uv = ($row["Minutes"] ? $row["Minutes"] / 60 / 60 : 0);
+								}
+								echo '["'.returnMonth($i).'", '.$uv.'],';
+							}
+							echo ']);
+								  var view = new google.visualization.DataView(data);
+								  var options = {
+									title: "Average time spent/session",
+									width: "auto",
+									height: 400,
+								  };
+								  var chart = new google.visualization.ColumnChart(document.getElementById("sessspent-chart"));
+								  chart.draw(view, options);
+								}</script>';
 							break;
 						case "detailed":
-							
+							echo '<div class=".col-lg-6 .col-md-6 .col-sm-12 .col-xs-12" id="browser-chart"></div>';
+							echo '<div class=".col-lg-6 .col-md-6 .col-sm-12 .col-xs-12" id="os-chart"></div>';
+							echo '<div class=".col-lg-6 .col-md-6 .col-sm-12 .col-xs-12" id="devices-chart"></div>';
+							echo '<div class=".col-lg-6 .col-md-6 .col-sm-12 .col-xs-12" id="uniquevis-chart"></div>';
+							echo '<div class=".col-lg-6 .col-md-6 .col-sm-12 .col-xs-12" id="sessions-chart"></div>';
+							echo '<div class=".col-lg-6 .col-md-6 .col-sm-12 .col-xs-12" id="pagespent-chart"></div>';
+							echo '<div class=".col-lg-6 .col-md-6 .col-sm-12 .col-xs-12" id="sessspent-chart"></div>';
+							echo '<script>google.load("visualization", "1", {packages:["corechart"]}); google.setOnLoadCallback(drawChart);';
+							echo 'function drawChart() {
+								  var data = google.visualization.arrayToDataTable([
+									["Month", "Visitors"],';
+							for ($i = 1; $i <= 12; $i++) {
+								$res = retResult("visitors", "WHERE FirstVisit>".mktime(0, 0, 0, $i, 1, date("Y"))." AND FirstVisit<".mktime(0, 0, 0, ($i < 12 ? $i + 1 : 1), 1, ($i == 12 ? intval(date("Y")) + 1 : date("Y"))));
+								$uv = 0;
+								if ($res) {
+									$uv = mysqli_num_rows($res);
+								}
+								echo '["'.returnMonth($i).'", '.$uv.'],';
+							}
+							echo ']);
+								  var view = new google.visualization.DataView(data);
+								  var options = {
+									title: "Unique visitors/month",
+									width: "auto",
+									height: 400,
+								  };
+								  var chart = new google.visualization.ColumnChart(document.getElementById("uniquevis-chart"));
+								  chart.draw(view, options);';
+							echo 'var data = google.visualization.arrayToDataTable([
+									["Month", "Sessions"],';
+							for ($i = 1; $i <= 12; $i++) {
+								$res = retResult("sessions", "WHERE Start>".mktime(0, 0, 0, $i, 1, date("Y"))." AND Start<".mktime(0, 0, 0, ($i < 12 ? $i + 1 : 1), 1, ($i == 12 ? intval(date("Y")) + 1 : date("Y"))));
+								$uv = 0;
+								if ($res) {
+									$uv = mysqli_num_rows($res);
+								}
+								echo '["'.returnMonth($i).'", '.$uv.'],';
+							}
+							echo ']);
+								  var view = new google.visualization.DataView(data);
+								  var options = {
+									title: "Sessions/month",
+									width: "25%",
+									height: 400,
+								  };
+								  var chart = new google.visualization.ColumnChart(document.getElementById("sessions-chart"));
+								  chart.draw(view, options);';
+							echo 'var data = google.visualization.arrayToDataTable([
+									["Month", "Minutes"],';
+							for ($i = 1; $i <= 12; $i++) {
+								$res = mysqli_query($con, "SELECT AVG(End-Start) AS Minutes FROM visits WHERE Start>".mktime(0, 0, 0, $i, 1, date("Y"))." AND Start<".mktime(0, 0, 0, ($i < 12 ? $i + 1 : 1), 1, ($i == 12 ? intval(date("Y")) + 1 : date("Y"))).' AND End > 0');
+								$uv = 0;
+								if ($res) {
+									$row = mysqli_fetch_array($res);
+									$uv = ($row["Minutes"] ? $row["Minutes"] / 60 / 60 : 0);
+								}
+								echo '["'.returnMonth($i).'", '.$uv.'],';
+							}
+							echo ']);
+								  var view = new google.visualization.DataView(data);
+								  var options = {
+									title: "Average time spent/visit",
+									width: "auto",
+									height: 400,
+								  };
+								  var chart = new google.visualization.ColumnChart(document.getElementById("pagespent-chart"));
+								  chart.draw(view, options);';
+							echo 'var data = google.visualization.arrayToDataTable([
+									["Month", "Minutes"],';
+							for ($i = 1; $i <= 12; $i++) {
+								$res = mysqli_query($con, "SELECT AVG(End-Start) AS Minutes FROM sessions WHERE Start>".mktime(0, 0, 0, $i, 1, date("Y"))." AND Start<".mktime(0, 0, 0, ($i < 12 ? $i + 1 : 1), 1, ($i == 12 ? intval(date("Y")) + 1 : date("Y"))).' AND End > 0');
+								$uv = 0;
+								if ($res) {
+									$row = mysqli_fetch_array($res);
+									$uv = ($row["Minutes"] ? $row["Minutes"] / 60 / 60 : 0);
+								}
+								echo '["'.returnMonth($i).'", '.$uv.'],';
+							}
+							echo ']);
+								  var view = new google.visualization.DataView(data);
+								  var options = {
+									title: "Average time spent/session",
+									width: "auto",
+									height: 400,
+								  };
+								  var chart = new google.visualization.ColumnChart(document.getElementById("sessspent-chart"));
+								  chart.draw(view, options);';
+							echo 'var data = google.visualization.arrayToDataTable([
+									["Device", "Count"],';
+							$res = mysqli_query($con, "SELECT Mobile, COUNT(Mobile) AS Devices FROM visitors GROUP BY Mobile ORDER BY Mobile ASC");
+							if ($res) {
+								$row = mysqli_fetch_array($res);
+								echo '["Desktop", '.($row["Devices"] ? $row["Devices"] : 0).'],';
+								$row = mysqli_fetch_array($res);
+								echo '["Mobile", '.($row["Devices"] ? $row["Devices"] : 0).']';
+							}
+							echo ']);
+								  var view = new google.visualization.DataView(data);
+								  var options = {
+									title: "Devices",
+									width: "auto",
+									height: 400,
+								  };
+								  var chart = new google.visualization.PieChart(document.getElementById("devices-chart"));
+								  chart.draw(view, options);';
+							echo 'var data = google.visualization.arrayToDataTable([
+									["OS", "Count"],';
+							$res = mysqli_query($con, "SELECT OS, COUNT(OS) AS OSs FROM visitors GROUP BY OS");
+							if ($res) {
+								while ($row = mysqli_fetch_array($res)) {
+									echo '["'.$row["OS"].'", '.($row["OSs"] ? $row["OSs"] : 0).'],';
+								}
+							}
+							echo ']);
+								  var view = new google.visualization.DataView(data);
+								  var options = {
+									title: "Operating Systems",
+									width: "auto",
+									height: 400,
+								  };
+								  var chart = new google.visualization.PieChart(document.getElementById("os-chart"));
+								  chart.draw(view, options);';
+							echo 'var data = google.visualization.arrayToDataTable([
+									["Browser", "Count"],';
+							$res = mysqli_query($con, "SELECT Browser, COUNT(Browser) AS Browsers FROM visitors GROUP BY Browser");
+							if ($res) {
+								while ($row = mysqli_fetch_array($res)) {
+									echo '["'.$row["Browser"].'", '.($row["Browsers"] ? $row["Browsers"] : 0).'],';
+								}
+							}
+							echo ']);
+								  var view = new google.visualization.DataView(data);
+								  var options = {
+									title: "Browsers",
+									width: "auto",
+									height: 400,
+								  };
+								  var chart = new google.visualization.PieChart(document.getElementById("browser-chart"));
+								  chart.draw(view, options);
+								}</script>';
 							break;
 					}
 					break;

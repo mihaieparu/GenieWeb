@@ -62,6 +62,7 @@
                     <li><a href="view.php?what=timeline">Timeline</a></li>
                     <li><a href="view.php?what=menu">Menu</a></li>
                     <li><a href="view.php?what=pages">Pages</a></li>
+                    <li><a href="view.php?what=routes">Routes</a></li>
                 </ul>
             </li>
             <li class="dropdown">
@@ -71,13 +72,21 @@
                     <li><a href="view.php?what=definitions">Definitions</a></li>
                 </ul>
             </li>
-            <li><a href="view.php?what=routes"><span class="fa fa-fw fa-random"></span> Routes</a></li>
+            <li class="dropdown">
+                <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false"><span class="fa fa-fw fa-newspaper-o"></span> Newsletter <span class="caret"></span></a>
+                <ul class="dropdown-menu" role="menu">
+                    <li><a href="newsletter.php?to=JSON" target="_blank">Export to JSON</a></li>
+                    <li><a href="newsletter.php?to=CSV" target="_blank">Export to CSV</a></li>
+                    <li><a href="newsletter.php?to=XML" target="_blank">Export to XML</a></li>
+                    <li><a href="newsletter.php?to=PLAIN" target="_blank">Export to plain text</a></li>
+                </ul>
+            </li>
 			<li><a href="view.php?what=users"><span class="fa fa-fw fa-users"></span> Users</a></li>
             <li class="dropdown">
                 <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false"><span class="fa fa-fw fa-pie-chart"></span> Statistics <span class="caret"></span></a>
                 <ul class="dropdown-menu" role="menu">
                     <li><a href="view.php?what=statistics&type=summary">Summary</a></li>
-                    <li><a href="edit.php?what=statistics&type=detailed">Detailed</a></li>
+                    <li><a href="view.php?what=statistics&type=detailed">Detailed</a></li>
                 </ul>
             </li>
             <li><a href="javascript:logout();"><span class="fa fa-fw fa-sign-out"></span> Log out</a></li>
@@ -137,10 +146,37 @@
 					}
 					$querydata .= " WHERE ID='".$_POST["id"]."'";
 					mysqli_query($con, $querydata);
-					/*echo '<script>location.href="view.php?what='.$_GET["what"].'";</script>';*/
+					echo '<script>location.href="view.php?what='.$_GET["what"].'";</script>';
 				}
 				else {
-					
+					if (isset($_GET["all"]) && $_GET["all"] == "true") {
+						foreach ($_POST as $key => $val) {
+							$val = str_replace("'", "", strip_tags(urldecode($val)));
+							if (strpos($key, "key-") !== FALSE) {
+								$res = retResult("languages", "");
+								if ($res) {
+									while ($row = mysqli_fetch_array($res)) {
+										if (isset($_POST["value-".str_replace($key, "key-", "")."-".$row["LangCode"]])) {
+											mysqli_query($con, "UPDATE `lang_".$row["LangCode"]."` SET `Value`='".base64_encode(urldecode($_POST["value-".str_replace($key, "key-", "")."-".$row["LangCode"]]))."' WHERE `Key`='".str_replace($key, "key-", "")."'");
+										}
+									}
+								}
+							}
+						}
+						echo '<script>location.href="view.php?what='.$_GET["what"].'";</script>';
+					}
+					else {
+						$_POST["Key"] = str_replace("'", "", strip_tags(urldecode($_POST["Key"])));
+						$res = retResult("languages", "");
+						if ($res) {
+							while ($row = mysqli_fetch_array($res)) {
+								if (isset($_POST["value-".$row["LangCode"]])) {
+									mysqli_query($con, "UPDATE `lang_".$row["LangCode"]."` SET `Value`='".base64_encode(urldecode($_POST["value-".$row["LangCode"]]))."' WHERE `Key`='".$_POST["Key"]."'");
+								}
+							}
+						}
+						echo '<script>location.href="view.php?what='.$_GET["what"].'";</script>';
+					}
 				}
 			}
 		}
@@ -178,13 +214,66 @@
 						echo '<form action="edit.php?what=languages" method="POST"><input type="hidden" name="is_form" value="true" /><input type="hidden" name="id" value="'.$_GET["id"].'" /><div class="row"><div style="margin-bottom:25px" class="col-lg-6 col-md-6 col-sm-12 col-xs-12 col-lg-offset-3 col-md-offset-3"><div class="input-group"><span class="input-group-addon">Language code</span><input type="text" class="form-control" name="LangCode" value="'.$row["LangCode"].'" required placeholder="ISO 639-1 language code" /></div></br><div class="input-group"><span class="input-group-addon">Language name</span><input type="text" required name="LangName" class="form-control" placeholder="Language full name" value="'.$row["LangName"].'"/></div></br><div class="input-group"><span class="input-group-addon">Language show-as</span><input type="text" name="LangShow" value="'.$row["LangShow"].'" class="form-control" placeholder="Language show-as" required /></div><br /><center><input type="checkbox" name="Default" id="def" '.($row["Default"] == "1" ? 'checked="checked"' : '').' /> <label for="def">Default language</label></div></div><center><button type="submit" class="btn btn-default" style="margin-bottom:25px"><span class="fa fa-fw fa-save"></span> Save language!</button></center></div></form>';
 						break;
 					case "definitions":
+						$_GET["id"] = str_replace("'", "", strip_tags($_GET["id"]));
 						if ($_GET["id"] == "all") {
-							
+							$res = retResult("languages", "");
+							if ($res) {
+								$joins = ""; $prec = "";
+								$row = mysqli_fetch_array($res);
+								$joins = ""; $select = "";
+								$prec = $row["LangCode"];
+								$init = $row["LangCode"];
+								$keys = "";
+								$select = ", `lang_".$row["LangCode"]."`.`Value` AS `Value_".$row["LangCode"]."`";
+								$keys = "`lang_".$row["LangCode"]."`.`Key`";
+								while ($row = mysqli_fetch_array($res)) {
+									$keys .= ", `lang_".$row["LangCode"]."`.`Key`";
+									$select .= ", `lang_".$row["LangCode"]."`.`Value` AS `Value_".$row["LangCode"]."`";
+									$joins .= "LEFT JOIN `lang_".$row["LangCode"]."` ON `lang_".$row["LangCode"]."`.`Key`=`lang_".$prec."`.`Key` ";
+									$prec = $row["LangCode"];
+								}
+								$joins = "SELECT COALESCE(".$keys.") AS `Key`".$select." FROM `lang_".$init."` ".$joins;
+								$joins .= " UNION ".str_replace("LEFT", "RIGHT", $joins);
+								$res = mysqli_query($con, $joins);
+								if ($res) {
+									echo '<div class="page-header" style="margin-top:0"><h1 style="margin-top:10px">Edit definitions';
+									$res1 = retResult("languages", "");
+									$langs = array();
+									echo '</h1></div>';
+									echo '<form action="edit.php?what=definitions&all=true" method="POST"><input type="hidden" name="is_form" value="true" /><div class="table-responsive"><table class="table table-striped table-hover"><thead><tr><th>Key</th>';
+									while ($row1 = mysqli_fetch_array($res1)) {
+										array_push($langs, $row1["LangCode"]);
+										echo '<th><img src="http://l10n.xwiki.org/xwiki/bin/download/L10N/Flags/'.$row1["LangCode"].'.png" /> '.$row1["LangName"].'</th>';
+									}
+									echo '</thead><tbody>';
+									while ($row = mysqli_fetch_array($res)) {
+										echo '<tr><td><input type="hidden" name="key-'.$row["Key"].'" />'.$row["Key"].'</td>';
+										foreach ($langs as $lng) {
+											echo '<td><input type="text" class="form-control input-sm" name="value-'.$row["Key"].'-'.$lng.'" value="'.base64_decode($row["Value_".$lng]).'" /></td>';
+										}
+										echo '</tr>';
+									}
+									echo '</tbody></table></div></br><center><button type="submit" class="btn btn-default" style="margin-bottom:25px"><span class="fa fa-fw fa-save"></span> Save definitions!</button></center></form>';
+								}
+							}
+						}
+						else {
+							echo '<div class="page-header" style="margin-top:0"><h1 style="margin-top:10px">Edit definition</h1></div>';
+							echo '<form action="edit.php?what=definitions" method="POST"><input type="hidden" name="Key" value="'.$_GET["id"].'" /><input type="hidden" name="is_form" value="true" /><div class="row"><div style="margin-bottom:25px" class="col-lg-6 col-md-6 col-sm-12 col-xs-12 col-lg-offset-3 col-md-offset-3"><div class="input-group"><span class="input-group-addon">Key</span><input type="text" class="form-control" value="'.$_GET["id"].'" disabled placeholder="Key (e.g. @key/example)" /></div>';
+							$res = retResult("languages", "");
+							if ($res) {
+								while ($row = mysqli_fetch_array($res)) {
+									$res1 = retResult("lang_".$row["LangCode"], "WHERE `Key`='".$_GET["id"]."'");
+									if ($res1) { $row1 = mysqli_fetch_array($res1); }
+									echo '<br/><div class="input-group"><span class="input-group-addon"><img src="http://l10n.xwiki.org/xwiki/bin/download/L10N/Flags/'.$row["LangCode"].'.png" /></span><input type="text" name="value-'.$row["LangCode"].'" class="form-control" value="'.(isset($row1) ? base64_decode($row1["Value"]) : '').'" placeholder="String for '.$row["LangName"].'" /></div>';
+								}
+							}
+							echo '</div></div><center><button type="submit" class="btn btn-default" style="margin-bottom:25px"><span class="fa fa-fw fa-save"></span> Save definition!</button></center></form>';
 						}
 						break;
 					case "routes":
 						echo '<div class="page-header" style="margin-top:0"><h1 style="margin-top:10px">Edit route</h1></div>';
-						echo '<form action="edit.php?what=routes" method="POST"><input type="hidden" name="is_form" value="true" /><input type="hidden" name="id" value="'.$_GET["id"].'" /><div class="row"><div style="margin-bottom:25px" class="col-lg-6 col-md-6 col-sm-12 col-xs-12 col-lg-offset-3 col-md-offset-3"><div class="input-group"><span class="input-group-addon">Route</span><input type="text" class="form-control" name="Route" value="'.$row["Route"].'" required placeholder="Route" /></div></br><div class="input-group"><span class="input-group-addon">Attributes</span><input type="text" required name="Attributes" class="form-control" placeholder="Attributes received (e.g. %attr1%/%attr2%)" value="'.$row["Attributes"].'" /></div></br><div class="input-group"><span class="input-group-addon">Route to</span><input type="text" name="RouteTo" class="form-control" required placeholder="Route to" value="'.$row["RouteTo"].'" /></div></br><div class="input-group"><span class="input-group-addon">Attributes sent</span><input type="text" name="RouteToAttributes" class="form-control" placeholder="Attributes sent (e.g. attr1=%attr1%/attr2=%attr2%)" value="'.$row["RouteToAttributes"].'" /></div></div></div><center><button type="submit" class="btn btn-default" style="margin-bottom:25px"><span class="fa fa-fw fa-save"></span> Save route!</button></center></div></form>';
+						echo '<form action="edit.php?what=routes" method="POST"><input type="hidden" name="is_form" value="true" /><input type="hidden" name="id" value="'.$_GET["id"].'" /><div class="row"><div style="margin-bottom:25px" class="col-lg-6 col-md-6 col-sm-12 col-xs-12 col-lg-offset-3 col-md-offset-3"><div class="input-group"><span class="input-group-addon">Route</span><input type="text" class="form-control" name="Route" value="'.$row["Route"].'" required placeholder="Route" /></div></br><div class="input-group"><span class="input-group-addon">Attributes</span><input type="text" name="Attributes" class="form-control" placeholder="Attributes received (e.g. %attr1%/%attr2%)" value="'.$row["Attributes"].'" /></div></br><div class="input-group"><span class="input-group-addon">Route to</span><input type="text" name="RouteTo" class="form-control" required placeholder="Route to" value="'.$row["RouteTo"].'" /></div></br><div class="input-group"><span class="input-group-addon">Attributes sent</span><input type="text" name="RouteToAttributes" class="form-control" placeholder="Attributes sent (e.g. attr1=%attr1%/attr2=%attr2%)" value="'.$row["RouteToAttributes"].'" /></div></div></div><center><button type="submit" class="btn btn-default" style="margin-bottom:25px"><span class="fa fa-fw fa-save"></span> Save route!</button></center></div></form>';
 					break;
 				default:
 					echo 'Bad request. Please try again.';
