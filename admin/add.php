@@ -135,6 +135,7 @@
 							$querydata .= "(`Route`, `DateAdded`, `Title`, `Content`) VALUES ('".$_POST["Route"]."', '".time()."', '".$_POST["Title"]."', '".$_POST["Content"]."')";
 							break;
 						case "languages":
+							mysqli_query($con, "CREATE TABLE `lang_".$_POST["LangCode"]."` (`ID` INT(11) UNSIGNED AUTO_INCREMENT PRIMARY KEY, `Key` TEXT NOT NULL, `Value` TEXT NOT NULL)");
 							$querydata .= "(`LangCode`, `LangName`, `LangShow`, `Default`) VALUES ('".$_POST["LangCode"]."', '".$_POST["LangName"]."', '".$_POST["LangShow"]."', '".$_POST["Default"]."')";
 							break;
 						case "routes":
