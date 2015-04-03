@@ -52,7 +52,12 @@ function linkAJAXGo() {
 }
 function routeTo(route, attributes) {
 	if (route != "") {
-		getRoute(route, attributes);
+		if (route.indexOf("/") == -1) {
+			getRoute(route, attributes);
+		}
+		else if (!attributes) {
+			routeTo(route.substr(0, route.indexOf("/")), route.substr(route.indexOf("/") + 1));
+		}
 	}
 }
 function getRoute(route, attributes) {
