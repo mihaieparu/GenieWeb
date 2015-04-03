@@ -329,7 +329,7 @@ function JSONRender(string, jumpTo) {
 			$("#jumbotron").show().animate({opacity:1}, 500);
 			if ($("#jumbotron").length) { animateJumbotron(); }
 			if ($("#content").children("*").length) { animateContent(); }
-			if (jumpTo) { setTimeout(function() { scrollToEl(jumpTo); }, 250); }
+			if (jumpTo) { setTimeout(function() { scrollToEl(jumpTo); }, 500); }
 		}
 		else {
 			showError(404);
