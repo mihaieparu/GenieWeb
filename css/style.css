@@ -504,6 +504,9 @@ a, a:active, a:hover, a:focus {
 	width:auto;
 	margin-top:35px;
 }
+.follow h2 {
+	font-style:normal;
+}
 @media (max-width:768px) {
 	.scrollspy {
 		display:none;
@@ -604,14 +607,20 @@ a, a:active, a:hover, a:focus {
 		font-family:Titillium Web !important;
 		font-weight:bold;
 	}
+	.job {
+		padding:35px 20px !important;
+	}
 	.job h1 {
-		font-size:1em !important;
+		font-size:0.75em !important;
 	}
 	.job .ref {
-		font-size:0.45em;
+		font-size:0.40em;
 	}
 	.job .city {
-		font-size:0.45em;
+		font-size:0.40em;
+	}
+	.job .btn {
+		font-size:0.45em !important;
 	}
 	.contact .contact-form {
 		max-width:95%;

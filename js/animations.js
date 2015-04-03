@@ -53,7 +53,7 @@ $(document).ready(function() {
 	});
 	$("#content").on("mouseenter", "* .btn", function() {
 		if ($(this).attr("data-hover-to")) {
-			$(this).animate({color:"white", backgroundColor:$(this).attr("data-hover-to")}, 250);
+			$(this).animate({color:($(this).attr("data-hover-into") ? $(this).attr("data-hover-into") : "white"), backgroundColor:$(this).attr("data-hover-to")}, 250);
 			$(this).children(".glyphicon, .fa").animate({color:($(this).attr("data-hover-into") ? $(this).attr("data-hover-into") : "white")}, 250);
 		}
 		else if ($(this).parents(".contrast").length || $(this).hasClass("contrast"))  {

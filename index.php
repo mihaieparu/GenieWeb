@@ -55,7 +55,7 @@
 		while ($row = mysqli_fetch_array($res)) {
 			echo '<element id="el-'.$row["ID"].'" '.($row["Target"] == "_self" ? 'data-useajax="true" ' : '').'data-URL="'.$row["URL"].'" data-target="'.$row["Target"].'" ';
 			if (substr($row["Title"], 0, 1) == "@") {
-				echo 'data-usetraslr-title="true" ';
+				echo 'data-usetranslr-title="true" ';
 			}
 			echo 'data-title="'.$row["Title"].'" ';
 			if (substr($row["Name"], 0, 1) == "@") {

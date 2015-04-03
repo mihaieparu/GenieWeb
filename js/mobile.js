@@ -38,6 +38,7 @@ function menuCreate() {
 		else {
 			$("#menu").append(links);
 		}
+		updateTranslr();
 	}
 }
 function menuUpdate() {
