@@ -10,7 +10,7 @@
 				echo '<div class="'.(($row["DateExpire"] > time()) && ($row["Applications"] == "1") ? 'col-lg-8 col-md-6 col-sm-12 col-xs-12' : 'col-lg-12 col-md-12 col-sm-12 col-xs-12').'"><h1 style="margin-top:0"'.(strpos($row["Title"], "@") === 0 ? ' data-translr-value="'.$row["Title"].'">' : '>'.$row["Title"]).'</h1>'.($row["DateExpire"] < time() ? '<h3 class="text-danger" data-translr-value="@jobs/expired"></h2>' : '').'<h3><span data-translr-value="@jobs/ref"></span>: <b>#'.$row["Ref"].'</b></h3><h3><span data-translr-value="@jobs/city"></span>: <b>'.$row["City"].'</b></h3><h3 style="text-align:justify"'.(strpos(base64_decode($row["Description"]), "@") === 0 ? ' data-translr-value="'.base64_decode($row["Description"]).'">' : '>'.base64_decode($row["Description"])).'</h3></div>';
 				if (($row["DateExpire"] > time()) && ($row["Applications"] == "1")) {
 					echo '<div class="col-lg-4 col-md-6 col-sm-12 col-xs-12">';
-					$contact = '{"fileupload": "1", "email": "'.$row["ApplicationEmail"].'", "custom_h1": "<span data-translr-value=@jobs/apply-now></span>", "custom_subject": "Ref. #'.$row["Ref"].'"}';
+					$contact = '{"fileupload": "1", "email": "'.$row["ApplicationEmail"].'", "custom_h1": "<span data-translr-value=@jobs/apply-now></span>", "custom_subject": "Ref. #'.$row["Ref"].'", "file_label": "CV"}';
 					include ("contact.php");
 					echo '</div>';
 				}

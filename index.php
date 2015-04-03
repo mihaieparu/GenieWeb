@@ -11,20 +11,20 @@
 <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap.min.css" />
 <link rel="stylesheet" href="https://code.jquery.com/ui/1.10.4/themes/ui-lightness/jquery-ui.css" />
 <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css">
-<link rel="stylesheet" href="css/bootstrap.min.css" />
-<link rel="stylesheet" href="css/style.css" />
+<link rel="stylesheet" href="/css/bootstrap.min.css" />
+<link rel="stylesheet" href="/css/style.css" />
 <script src="https://code.jquery.com/jquery-1.11.2.min.js"></script>
 <script src="https://code.jquery.com/ui/1.11.4/jquery-ui.min.js"></script>
 <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/js/bootstrap.min.js"></script>
-<script><?php echo 'var ign_pathname = "'.dirname($_SERVER['REQUEST_URI']).'";'; ?></script>
-<script src="js/stats.js"></script>
-<script src="js/script.js"></script>
-<script src="js/mobile.js"></script>
-<script src="js/animations.js"></script>
-<script src="js/base64.js"></script>
-<script src="js/translr.js"></script>
-<script src="js/scrollspy.js"></script>
-<script src="js/ajax.js"></script>
+<script><?php echo 'var ign_pathname = "'.(strpos($_SERVER['REQUEST_URI'], ".") !== FALSE ? dirname($_SERVER['REQUEST_URI']) : '/').'";'; ?></script>
+<script src="/js/stats.js"></script>
+<script src="/js/script.js"></script>
+<script src="/js/mobile.js"></script>
+<script src="/js/animations.js"></script>
+<script src="/js/base64.js"></script>
+<script src="/js/translr.js"></script>
+<script src="/js/scrollspy.js"></script>
+<script src="/js/ajax.js"></script>
 </head>
 <?php
 	include ("connect.php");
