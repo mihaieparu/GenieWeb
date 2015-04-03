@@ -4,7 +4,7 @@
 			$lang = $_COOKIE["language"];
 		}
 		else {
-			$res = retResult("languages", "WHERE Default='1'");
+			$res = retResult("languages", "WHERE `Default`='1'");
 			if ($res) {
 				$row = mysqli_fetch_array($res);
 				setcookie("language", $row["LangCode"], 0, "/");

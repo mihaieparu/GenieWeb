@@ -114,7 +114,7 @@
 							echo 0;
 						}
 					?>
-                    </b> languages in the database, which are described by <b>
+                    </b> languages in the database, which are translated using <b>
                     <?php
 						if ($res) { 
 							$joins = ""; $prec = "";

@@ -7,17 +7,6 @@ $(document).ready(function() {
 	setInterval(function() {
 		linkAJAXGo();
 	}, 500);
-	setInterval(function() {
-		if (!(location.href.indexOf(".php") != -1)) {
-			if (location.pathname.replace(ign_pathname, "").split("/")[0] != curr_route) {
-				var attr = "";
-				for (var i = 1; i < location.pathname.replace(ign_pathname, "").split("/").length; i++) {
-					attr += location.pathname.replace(ign_pathname, "").split("/")[i] + (i < location.pathname.replace(ign_pathname, "").split("/").length - 1 ? "/" : "");
-				}
-				routeTo(location.pathname.replace(ign_pathname, "").split("/")[0], attr);
-			}
-		}
-	}, 500);
 });
 var elementcount = 0;
 function loaderImg() {

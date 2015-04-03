@@ -136,7 +136,7 @@
 							break;
 						case "languages":
 							mysqli_query($con, "CREATE TABLE `lang_".$_POST["LangCode"]."` (`ID` INT(11) UNSIGNED AUTO_INCREMENT PRIMARY KEY, `Key` TEXT NOT NULL, `Value` TEXT NOT NULL)");
-							$querydata .= "(`LangCode`, `LangName`, `LangShow`, `Default`) VALUES ('".$_POST["LangCode"]."', '".$_POST["LangName"]."', '".$_POST["LangShow"]."', '".$_POST["Default"]."')";
+							$querydata .= "(`LangCode`, `LangName`, `LangShow`, `Default`) VALUES ('".$_POST["LangCode"]."', '".$_POST["LangName"]."', '".$_POST["LangShow"]."', '".(isset($_POST["Default"]) ? $_POST["Default"] : '0')."')";
 							break;
 						case "routes":
 							$querydata .= "(`Route`, `Attributes`, `RouteTo`, `RouteToAttributes`, `Views`) VALUES ('".$_POST["Route"]."', '".$_POST["Attributes"]."', '".$_POST["RouteTo"]."', '".$_POST["RouteToAttributes"]."', '0')";

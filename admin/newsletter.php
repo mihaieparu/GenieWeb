@@ -57,6 +57,11 @@
 				}
 				fclose($output);
 				break;
+			case "EMAILLIST":
+				for ($i = 1; $i <= count($emails); $i++) {
+					echo $emails[$i].($i < count($emails) ? ", " : "");
+				}
+				break;
 		}
 	}
 ?>

@@ -36,11 +36,14 @@ function animateButtons() {
 		}
 	});
 }
+$(document).ajaxComplete(function() {
+    animateButtons();
+});
 $(document).ready(function() {
-	$("#menu").on("mouseenter", ".menu-el", function() {
+	$("#menu").on("mouseenter", "* .menu-el", function() {
 		$(this).animate({color: menuhovercolor}, 250);
 	});
-	$("#menu").on("mouseleave", ".menu-el", function() {
+	$("#menu").on("mouseleave", "* .menu-el", function() {
 		$(this).animate({color: "white"}, 250);
 	});
 	$("body").on("mouseenter", "#jumbotron .jumbotron-container .btn", function() {

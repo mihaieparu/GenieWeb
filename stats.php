@@ -33,6 +33,7 @@
 			$visid = (isset($_POST["visid"]) ? $_POST["visid"] : $_COOKIE["visit_id"]);
 			mysqli_query($con, "UPDATE visits SET End='".time()."' WHERE visID='".$visid."'");
 			if (isset($_COOKIE["session_id"]) && $_COOKIE["session_id"] != "") { mysqli_query($con, "UPDATE sessions SET End='".time()."' WHERE sessID='".$_COOKIE["session_id"]."'"); }
+			setcookie("visit_id", "");
 		}
 	}
 	mysqli_close($con);

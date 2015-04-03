@@ -454,7 +454,7 @@ a, a:active, a:hover, a:focus {
 }
 .contact-form label {
 	font-weight:400;
-	font-size:1.15em;
+	font-size:0.95em;
 	color:black;
 }
 .contact-form input, .contact-form textarea {
@@ -636,6 +636,9 @@ a, a:active, a:hover, a:focus {
 	.contact .contact-form textarea {
 		font-size:0.75em !important;
 		padding:10px!important;
+	}
+	.contact .contact-form label {
+		font-size:0.65em;
 	}
 	.newsletter .newsletter-form {
 		max-width:85%;
