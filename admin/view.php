@@ -231,7 +231,7 @@
 						echo ' <small>('.mysqli_num_rows($res).' elements)</small><a href="add.php?what=users" class="pull-right btn btn-default">Add new user</a></h1></div>';
 						echo '<div class="table-responsive"><table class="table table-striped table-hover"><thead><tr><th>#</td><th>Username</th><th>Last login</th><th>Last IP</th><th>Logged in</th><th>Actions</th></thead><tbody>';
 						while ($row = mysqli_fetch_array($res)) {
-							echo '<tr id="row-'.$row["ID"].'"><td>'.$row["ID"].'</td><td>'.$row["Username"].'</td><td>'.date("d.m.Y", $row["LastLogin"]).'</td><td>'.$row["LastIP"].'</td><td>'.($row["CurrSessID"] ? '<span class="fa fa-fw fa-check"></span>' : '<span class="fa fa-fw fa-times"></span>').'</td><td><a href="delete.php?what=users&id='.$row["ID"].'" class="btn btn-sm btn-danger">Delete</a></td></tr>';
+							echo '<tr id="row-'.$row["ID"].'"><td>'.$row["ID"].'</td><td>'.$row["Username"].'</td><td>'.($row["LastLogin"] != "" ? date("d.m.Y", doubleval($row["LastLogin"])) : '-').'</td><td>'.$row["LastIP"].'</td><td>'.($row["CurrSessID"] ? '<span class="fa fa-fw fa-check"></span>' : '<span class="fa fa-fw fa-times"></span>').'</td><td><a href="delete.php?what=users&id='.$row["ID"].'" class="btn btn-sm btn-danger">Delete</a></td></tr>';
 						}
 						echo '</tbody></table></div>';
 					}

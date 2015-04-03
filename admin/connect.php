@@ -10,7 +10,7 @@
 	function retResult($tbl, $arg) {
 		global $con;
 		$res = mysqli_query($con, "SELECT * FROM ".$tbl." ".$arg);
-		if (mysqli_num_rows($res)) {
+		if (!is_bool($res) && mysqli_num_rows($res)) {
 			return $res;
 		}
 		else {
